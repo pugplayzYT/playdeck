@@ -3,7 +3,7 @@ var ctx = document.getElementById('canvas').getContext('2d');
 var player = {x:400,y:250}, paused = true, last = 0;
 function reset() { player.x=400; player.y=250; paused=false; }
 PlayDeck.on(function (action) {
-  if (action==='back') location.href='../../index.html';
+  if (action==='back') PlayDeck.exitGame();
   if (action==='select') paused=false;
   if (action==='pause') paused=!paused;
 });

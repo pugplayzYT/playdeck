@@ -20,7 +20,7 @@ Set repository Settings → Pages → Source to **GitHub Actions**. Pushing to `
 
 ## Touch controls
 
-Games use a circular joystick and large Play / Pause buttons. Two-thumb input is supported; releasing or cancelling a touch resets movement. Keyboard and optional external gamepads remain available. Snake uses Canvas 2D. Wander requires WebGL. Test real phones and installed PWAs before claiming device compatibility.
+Games use a circular joystick and large Play / Pause buttons. Two-thumb input is supported; releasing or cancelling a touch resets movement. Keyboard and optional external gamepads remain available. Snake uses Canvas 2D. Wander requires WebGL and uses standard first-person controls: joystick movement and strafing, plus drag anywhere on the world to look around. Test real phones and installed PWAs before claiming device compatibility.
 
 ## Contribute
 

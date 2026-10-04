@@ -1,9 +1,21 @@
 (function () {
+  var libraryURL = new URL('../index.html#library', document.currentScript.src).href;
+  var exiting = false;
+  var lookAxes = [0, 0];
   var axes = [0, 0], touchAxes = [0, 0], pointer = null, previous = {}, lastDirection = '', nextRepeat = 0;
   function emit(action) { window.dispatchEvent(new CustomEvent('playdeckinput', {detail: {action: action}})); }
   function clearTouch() { pointer = null; touchAxes[0] = touchAxes[1] = 0; if (knob) knob.style.transform = ''; }
   window.PlayDeck = {
     axes: axes,
+    lookAxes: lookAxes,
+    enableLook: enableLook,
+    exitGame: async function () {
+      if (exiting) return;
+      exiting = true; clearTouch(); axes[0] = axes[1] = 0;
+      window.dispatchEvent(new Event('blur'));
+      try { if (document.fullscreenElement) await document.exitFullscreen(); } catch (e) { /* Navigation also ends fullscreen. */ }
+      location.replace(libraryURL);
+    },
     on: function (fn) { window.addEventListener('playdeckinput', function (e) { fn(e.detail.action); }); },
     fullscreen: async function (el) {
       try { if (!document.fullscreenElement && el.requestFullscreen) await el.requestFullscreen();
@@ -11,6 +23,59 @@
       } catch (e) { /* Installed PWAs request landscape via the manifest; browsers can restrict locking. */ }
     }
   };
+  // Attach to the game canvas so joysticks and action buttons keep their own touches.
+  // Deltas are fractions of the surface's shorter side, independent of pixel density.
+  function enableLook(surface) {
+    var active = null, x = 0, y = 0, delta = [0, 0], previousTouchAction = surface.style.touchAction;
+    surface.style.touchAction = 'none';
+    function reset() {
+      var id = active; active = null; delta[0] = delta[1] = 0;
+      if (id !== null && surface.hasPointerCapture(id)) surface.releasePointerCapture(id);
+    }
+    function down(e) {
+      if (active !== null || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      e.preventDefault(); active = e.pointerId; x = e.clientX; y = e.clientY;
+      surface.setPointerCapture(active);
+    }
+    function move(e) {
+      if (e.pointerId !== active) return;
+      e.preventDefault();
+      var bounds = surface.getBoundingClientRect(), size = Math.max(1, Math.min(bounds.width, bounds.height));
+      delta[0] += (e.clientX - x) / size; delta[1] += (e.clientY - y) / size;
+      x = e.clientX; y = e.clientY;
+    }
+    function up(e) {
+      if (e.pointerId !== active) return;
+      var id = active; active = null;
+      if (surface.hasPointerCapture(id)) surface.releasePointerCapture(id);
+    }
+    function cancel(e) { if (e.pointerId === active) reset(); }
+    function hidden() { if (document.hidden) reset(); }
+    surface.addEventListener('pointerdown', down);
+    surface.addEventListener('pointermove', move);
+    surface.addEventListener('pointerup', up);
+    surface.addEventListener('pointercancel', cancel);
+    surface.addEventListener('lostpointercapture', cancel);
+    window.addEventListener('blur', reset);
+    document.addEventListener('visibilitychange', hidden);
+    return {
+      consume: function () { var result = delta.slice(); delta[0] = delta[1] = 0; return result; },
+      reset: reset,
+      destroy: function () {
+        reset(); surface.style.touchAction = previousTouchAction;
+        surface.removeEventListener('pointerdown', down);
+        surface.removeEventListener('pointermove', move);
+        surface.removeEventListener('pointerup', up);
+        surface.removeEventListener('pointercancel', cancel);
+        surface.removeEventListener('lostpointercapture', cancel);
+        window.removeEventListener('blur', reset);
+        document.removeEventListener('visibilitychange', hidden);
+      }
+    };
+  }
+  document.querySelectorAll('[data-exit-game]').forEach(function (link) {
+    link.addEventListener('click', function (e) { e.preventDefault(); PlayDeck.exitGame(); });
+  });
   var stick = document.querySelector('.joystick'), knob = stick && stick.querySelector('.joystick-knob');
   function update(e) {
     var bounds = stick.getBoundingClientRect(), radius = bounds.width * .32;
@@ -46,6 +111,8 @@
     var pads = navigator.getGamepads ? navigator.getGamepads() : [], pad = null;
     for (var i = 0; i < pads.length; i++) if (pads[i] && pads[i].connected) { pad = pads[i]; break; }
     function pressed(n) { return !!(pad && pad.buttons[n] && pad.buttons[n].pressed); }
+    lookAxes[0] = pad && Math.abs(pad.axes[2] || 0) > .25 ? pad.axes[2] : 0;
+    lookAxes[1] = pad && Math.abs(pad.axes[3] || 0) > .25 ? pad.axes[3] : 0;
     var touching = pointer !== null;
     axes[0] = touching ? touchAxes[0] : pad && Math.abs(pad.axes[0] || 0) > .25 ? pad.axes[0] : 0;
     axes[1] = touching ? touchAxes[1] : pad && Math.abs(pad.axes[1] || 0) > .25 ? pad.axes[1] : 0;
