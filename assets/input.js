@@ -1,7 +1,47 @@
-(function(){
-var previous={},lastDirection='',nextRepeat=0,axes=[0,0],connected=false;
-window.PlayDeck={axes:axes,on:function(fn){window.addEventListener('playdeckinput',function(e){fn(e.detail.action);});},fullscreen:function(el){if(el.requestFullscreen)return el.requestFullscreen().catch(function(){return false;});return Promise.resolve(false);}};
-function emit(action){window.dispatchEvent(new CustomEvent('playdeckinput',{detail:{action:action}}));}
-function frame(time){var pads=navigator.getGamepads?navigator.getGamepads():[],pad=null;for(var i=0;i<pads.length;i++)if(pads[i]&&pads[i].connected){pad=pads[i];break;}var status=document.getElementById('controller-status');if(!!pad!==connected){connected=!!pad;document.body.classList.toggle('controller-mode',connected);if(status)status.textContent=connected?'● Controller connected':'○ Keyboard / pointer available';}if(pad){function pressed(n){return !!(pad.buttons[n]&&pad.buttons[n].pressed);}axes[0]=Math.abs(pad.axes[0]||0)>.25?pad.axes[0]:0;axes[1]=Math.abs(pad.axes[1]||0)>.25?pad.axes[1]:0;var direction=pressed(12)?'up':pressed(13)?'down':pressed(14)?'left':pressed(15)?'right':Math.abs(axes[0])>Math.abs(axes[1])?(axes[0]>.5?'right':axes[0]<-.5?'left':''):(axes[1]>.5?'down':axes[1]<-.5?'up':'');if(direction&&(direction!==lastDirection||time>=nextRepeat)){emit(direction);nextRepeat=time+(direction!==lastDirection?320:150);}lastDirection=direction;var mapping={0:'select',1:'back',9:'pause'};Object.keys(mapping).forEach(function(n){var down=pressed(+n);if(down&&!previous[n])emit(mapping[n]);previous[n]=down;});}else{axes[0]=axes[1]=0;previous={};lastDirection='';}requestAnimationFrame(frame);}requestAnimationFrame(frame);
-document.addEventListener('pointermove',function(){document.body.classList.remove('controller-mode');});document.addEventListener('keydown',function(){document.body.classList.remove('controller-mode');});window.addEventListener('playdeckinput',function(){document.body.classList.add('controller-mode');});
+(function () {
+  if (location.hostname === 'appassets.androidplatform.net') document.body.classList.add('native-app');
+  var axes = [0, 0], touchAxes = [0, 0], pointer = null, previous = {}, lastDirection = '', nextRepeat = 0;
+  function emit(action) { window.dispatchEvent(new CustomEvent('playdeckinput', {detail: {action: action}})); }
+  function clearTouch() { pointer = null; touchAxes[0] = touchAxes[1] = 0; if (knob) knob.style.transform = ''; }
+  window.PlayDeck = {
+    axes: axes,
+    on: function (fn) { window.addEventListener('playdeckinput', function (e) { fn(e.detail.action); }); },
+    fullscreen: async function (el) {
+      try { if (!document.fullscreenElement && el.requestFullscreen) await el.requestFullscreen();
+        if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape');
+      } catch (e) { /* Browser rotation restrictions do not affect the native Android app. */ }
+    }
+  };
+  var stick = document.querySelector('.joystick'), knob = stick && stick.querySelector('.joystick-knob');
+  function update(e) {
+    var bounds = stick.getBoundingClientRect(), radius = bounds.width * .32;
+    var x = e.clientX - bounds.left - bounds.width / 2, y = e.clientY - bounds.top - bounds.height / 2;
+    var distance = Math.hypot(x, y); if (distance > radius) { x *= radius / distance; y *= radius / distance; }
+    touchAxes[0] = Math.abs(x / radius) > .18 ? x / radius : 0;
+    touchAxes[1] = Math.abs(y / radius) > .18 ? y / radius : 0;
+    knob.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+  }
+  if (stick) {
+    stick.addEventListener('pointerdown', function (e) { if (pointer !== null) return; e.preventDefault(); pointer = e.pointerId; stick.setPointerCapture(pointer); update(e); });
+    stick.addEventListener('pointermove', function (e) { if (e.pointerId === pointer) update(e); });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (event) { stick.addEventListener(event, function (e) { if (e.pointerId === pointer) clearTouch(); }); });
+    stick.addEventListener('keydown', function (e) { var action = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'}[e.key]; if (action) { e.preventDefault(); emit(action); } });
+  }
+  window.addEventListener('blur', clearTouch);
+  document.addEventListener('visibilitychange', function () { if (document.hidden) { clearTouch(); axes[0] = axes[1] = 0; } });
+  function frame(time) {
+    var pads = navigator.getGamepads ? navigator.getGamepads() : [], pad = null;
+    for (var i = 0; i < pads.length; i++) if (pads[i] && pads[i].connected) { pad = pads[i]; break; }
+    function pressed(n) { return !!(pad && pad.buttons[n] && pad.buttons[n].pressed); }
+    var touching = pointer !== null;
+    axes[0] = touching ? touchAxes[0] : pad && Math.abs(pad.axes[0] || 0) > .25 ? pad.axes[0] : 0;
+    axes[1] = touching ? touchAxes[1] : pad && Math.abs(pad.axes[1] || 0) > .25 ? pad.axes[1] : 0;
+    var direction = !touching && pressed(12) ? 'up' : !touching && pressed(13) ? 'down' : !touching && pressed(14) ? 'left' : !touching && pressed(15) ? 'right' : Math.abs(axes[0]) > Math.abs(axes[1]) ? axes[0] > .4 ? 'right' : axes[0] < -.4 ? 'left' : '' : axes[1] > .4 ? 'down' : axes[1] < -.4 ? 'up' : '';
+    if (direction && (direction !== lastDirection || time >= nextRepeat)) { emit(direction); nextRepeat = time + (direction !== lastDirection ? 280 : 130); }
+    lastDirection = direction;
+    var mapping = {0:'select',1:'back',9:'pause'};
+    Object.keys(mapping).forEach(function (n) { var down = pressed(+n); if (down && !previous[n]) emit(mapping[n]); previous[n] = down; });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 })();

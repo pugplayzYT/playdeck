@@ -1,0 +1,60 @@
+name: Build Android app
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run check
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Keep preview signing identity across builds
+        if: github.event_name != 'pull_request'
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: playdeck-preview-signing-v1
+      - name: Build installable APK
+        run: gradle -p android assembleRelease lintRelease
+      - uses: actions/upload-artifact@v4
+        with:
+          name: playdeck-android
+          path: android/app/build/outputs/apk/release/app-release.apk
+  publish:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: android-release
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: playdeck-android
+          path: apk
+      - name: Publish Android download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mv apk/app-release.apk apk/playdeck.apk
+          if ! gh release view android-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create android-latest --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "PlayDeck for Android (preview)" --notes "Landscape mobile arcade with offline games and touch joysticks. Android 7.0+. Direct install APK, signed with a development identity. This preview is not a Google Play release. If an update reports a signing mismatch, uninstall the previous preview first (local scores will be removed)."
+          fi
+          gh release upload android-latest apk/playdeck.apk --clobber --repo "$GITHUB_REPOSITORY"

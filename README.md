@@ -1,23 +1,27 @@
 # PlayDeck
 
-A free, community-built HTML arcade for browsers, designed with TV screens and controllers in mind. Includes Snake and Wander, a small Three.js exploration game. No runtime dependencies or external CDN requests.
+A community-built mobile arcade. Tap a game, drag the joystick, and play. Includes Snake and Wander, a Three.js exploration game. The PlayDeck name and repository stay the same.
 
-## Run locally
+## Play on the web
 
-Run `npm start` (Python 3 required), then open http://localhost:8080. Run `npm run check` to validate submissions. There is no install or build step. Keep URLs relative so deployment works under `/playdeck/`.
+Run `npm start` (Python 3 required) and open http://localhost:8080. No dependency install or web build needed. `npm run check` validates the catalog and HTML references. The site works under a GitHub Pages project path.
 
-## GitHub Pages
+Set repository Settings → Pages → Source to **GitHub Actions**. Pushing to `main` validates and deploys the site at https://pugplayzyt.github.io/playdeck/ .
 
-In repository Settings → Pages, set **Source: GitHub Actions**. Merge this project into `main`; the workflow checks and deploys the static files. Pull requests run checks but do not deploy. The expected project URL is https://pugplayzyt.github.io/playdeck/ . Deployment requires repository Pages configuration and pushing these files; writing them locally does not publish the site.
+## Android app
 
-## Controls and compatibility
+[Download the Android APK](https://github.com/pugplayzYT/playdeck/releases/download/android-latest/playdeck.apk) after the **Build Android app** workflow completes. On Android, open the downloaded APK and allow installation from your browser when prompted. Requires Android 7.0+ and an up-to-date Android System WebView. The preview app runs in landscape in either horizontal orientation, hides system bars during play, and includes games offline. External links open in your browser. New games arrive through app updates; the website updates independently.
 
-The library supports keyboard arrows / Tab / Enter, pointer and touch. Standard-mapped controllers use D-pad or left stick, bottom face button (× / A) to select, right face button (○ / B) to return, and Options / Start to pause. Press a controller button after opening the page to allow detection. CSS hides the page cursor while controller input is active; pointer movement restores it. Browser chrome and OS cursors are outside the page's control.
+The workflow builds and publishes an installable APK to the `android-latest` release. Pull requests build and lint without publishing. Preview builds use a development signing identity cached between builds. If that cache is lost, an update may require uninstalling the old preview, which removes local scores. For production distribution, configure a permanent private release signing key and increase versionCode for every release. This preview is not a Google Play release.
 
-Gamepad API, button mappings, fullscreen and WebGL availability vary across console browsers. PS4/PS5 support is a target, **not verified compatibility**. PS5 does not offer a normal standalone browser app. Test on actual hardware before claiming support. Keyboard, pointer and on-screen controls remain available when a gamepad is not exposed. Snake uses Canvas 2D; Wander needs WebGL. Scores are stored on the current device when storage is available.
+To build locally, install JDK 17+, Android SDK 35 and Gradle 8.9, set `ANDROID_HOME`, then run `gradle -p android assembleRelease lintRelease`. The build copies the web files into app assets. No JavaScript native bridge or network permission is needed.
 
-## Add a game
+## Touch controls
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Games are code submissions reviewed through GitHub pull requests, not uploads from the website. Three.js 0.160.1 is bundled at `vendor/three.min.js`, with its upstream MIT license. Its classic script build avoids requiring ES module support in console browsers; upgrades should be tested carefully.
+Games use a circular touch joystick and large Play / Pause buttons. Releasing or cancelling the touch resets movement. Rotate your phone for landscape gameplay; the Android app enforces landscape. Browsers may refuse orientation locking outside fullscreen. Keyboard controls remain available, and optional external gamepads use the shared input API.
 
-Project code is MIT licensed; see [LICENSE](LICENSE).
+Snake uses Canvas 2D and stores high scores locally when storage is available. Wander requires WebGL. Test on actual phones before claiming device support.
+
+## Contribute
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Reviewed HTML, CSS and JavaScript games are added through pull requests. Three.js 0.160.1 is bundled locally with its MIT license. Project code is MIT licensed; see [LICENSE](LICENSE).

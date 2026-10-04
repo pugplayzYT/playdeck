@@ -22,7 +22,7 @@ body:
     id: controls
     attributes:
       label: Proposed controls
-      description: Describe controller, keyboard, and touch controls where possible.
+      description: Describe the touch joystick and action buttons. Include keyboard fallback where possible.
     validations:
       required: true
   - type: dropdown
