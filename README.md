@@ -24,4 +24,4 @@ Games use a circular joystick and large Play / Pause buttons. Two-thumb input is
 
 ## Contribute
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Reviewed HTML, CSS and JavaScript games are added through pull requests. Three.js 0.160.1 is bundled locally with its MIT license. Project code is MIT licensed; see [LICENSE](LICENSE).
+See [CONTRIBUTING.md](CONTRIBUTING.md). Reviewed HTML, CSS and JavaScript games are added through pull requests. Copy `games/template/` for 2D or `games/template-3d/` for a Three.js game with joystick movement and screen-drag camera controls. Three.js 0.160.1 is bundled locally with its MIT license. Project code is MIT licensed; see [LICENSE](LICENSE).

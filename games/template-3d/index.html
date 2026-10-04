@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111310">
+  <title>3D Starter — PlayDeck</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script src="../../assets/input.js" defer></script>
+  <script src="../../vendor/three.min.js" defer></script>
+  <script src="game.js" defer></script>
+  <script src="../../assets/pwa.js" defer></script>
+</head>
+<body class="game-page">
+  <main>
+    <div class="game-toolbar">
+      <h1>3D Starter <span style="color:var(--muted)">/ PlayDeck</span></h1>
+      <a href="../../index.html#library" data-exit-game>← Library</a>
+      <button id="restart">Restart</button>
+      <button id="fullscreen">Fullscreen</button>
+    </div>
+    <div class="game-stage" id="stage">
+      <canvas id="canvas" width="800" height="500" aria-label="3D starter game"></canvas>
+      <div class="game-status" id="status" role="status"></div>
+      <a class="game-exit" href="../../index.html#library" data-exit-game aria-label="Exit game and return to library">Exit game</a>
+      <div class="game-controls">
+        <div class="joystick" role="group" tabindex="0" aria-label="Movement joystick: drag to move, or use arrow keys"><span class="joystick-knob"></span></div>
+        <div class="game-actions"><button id="play">Play</button><button id="pause">Pause / Resume</button></div>
+      </div>
+    </div>
+    <p class="game-info">Joystick to walk and strafe. Drag the world with your other thumb to look around. On desktop: WASD to move, mouse drag or arrow keys to look. Replace this scene with your game.</p>
+    <p class="rotate-hint">Rotate your phone for more room to play.</p>
+  </main>
+</body>
+</html>

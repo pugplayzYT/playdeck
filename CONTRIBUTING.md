@@ -1,7 +1,7 @@
 # Build a mobile game for PlayDeck
 
 1. Fork the repository and create a branch.
-2. Copy `games/template/` to `games/your-game/`. Build a local HTML, CSS and JavaScript game. The starter includes a working touch joystick, action buttons, pause, restart and keyboard fallback.
+2. Copy `games/template/` for a 2D game or `games/template-3d/` for a 3D game to `games/your-game/`. Build a local HTML, CSS and JavaScript game. The starter includes a working touch joystick, action buttons, pause, restart and keyboard fallback.
 3. Design movement around a classic circular joystick. Read `PlayDeck.axes` every animation frame: X and Y range from -1 to 1 with a dead zone. Up is negative Y. `PlayDeck.on(action => ...)` provides discrete directions plus `select`, `pause` and `back`. Prefer analog axes for walking games and discrete directions for grid games. Do not add little directional arrow buttons. Games without movement can use large tap targets instead.
 4. Keep controls inside `.game-stage` so they remain available in fullscreen. Keep essential gameplay clear of the lower control corners. Support landscape screens, safe areas, pointer cancellation and multiple simultaneous touches. Pause on visibility loss and blur. Provide a clear return to the library, restart and Play / Pause buttons. Keep the `data-exit-game` link inside the game stage; `PlayDeck.exitGame()` leaves fullscreen, clears input and returns directly to the game library.
 5. For 3D, load `../../vendor/three.min.js` before your script and use global `THREE`. Handle WebGL failure with a visible message. Limit scene complexity and render resolution for phones. For first-person games, use joystick movement plus camera dragging on the world canvas (see the shared API below and Wander).
@@ -24,6 +24,8 @@ Protect `main`, require pull request review and validation, and restrict direct 
 PWA updates wait until the player chooses **Update PlayDeck** in the library or closes all app tabs. Do not force-reload games to apply updates. Landscape orientation is requested by the web manifest; desktop browsers and iOS may handle orientation differently.
 
 ## Standard 3D movement and camera controls
+
+Start with [`games/template-3d/`](games/template-3d/). It includes a simple Three.js scene, two-thumb controls, pause/resume, restart, fullscreen and an in-game exit. Customize the scene and add your game to the catalog when it is ready. The starter is not listed as a playable library game.
 
 Use the left joystick to walk forward/backward and strafe left/right. Let the other thumb drag anywhere on the world canvas to look horizontally and vertically. Attach look controls to the canvas, not the whole document, so touching the joystick, menus or action buttons cannot rotate the camera. Both thumbs must work simultaneously.
 
