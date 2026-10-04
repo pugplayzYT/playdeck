@@ -1,5 +1,4 @@
 (function () {
-  if (location.hostname === 'appassets.androidplatform.net') document.body.classList.add('native-app');
   var axes = [0, 0], touchAxes = [0, 0], pointer = null, previous = {}, lastDirection = '', nextRepeat = 0;
   function emit(action) { window.dispatchEvent(new CustomEvent('playdeckinput', {detail: {action: action}})); }
   function clearTouch() { pointer = null; touchAxes[0] = touchAxes[1] = 0; if (knob) knob.style.transform = ''; }
@@ -9,7 +8,7 @@
     fullscreen: async function (el) {
       try { if (!document.fullscreenElement && el.requestFullscreen) await el.requestFullscreen();
         if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape');
-      } catch (e) { /* Browser rotation restrictions do not affect the native Android app. */ }
+      } catch (e) { /* Installed PWAs request landscape via the manifest; browsers can restrict locking. */ }
     }
   };
   var stick = document.querySelector('.joystick'), knob = stick && stick.querySelector('.joystick-knob');

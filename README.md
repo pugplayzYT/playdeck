@@ -1,26 +1,26 @@
 # PlayDeck
 
-A community-built mobile arcade. Tap a game, drag the joystick, and play. Includes Snake and Wander, a Three.js exploration game. The PlayDeck name and repository stay the same.
+A community-built mobile gaming PWA. Tap a game, drag the joystick, and play. Includes Snake and Wander, a Three.js exploration game.
 
-## Play on the web
+## Play and install
 
-Run `npm start` (Python 3 required) and open http://localhost:8080. No dependency install or web build needed. `npm run check` validates the catalog and HTML references. The site works under a GitHub Pages project path.
+Open https://pugplayzyt.github.io/playdeck/ . On Android Chrome, tap **Install PlayDeck** when offered, or use the browser menu → Install app / Add to Home screen. On iPhone, open in Safari and use Share → Add to Home Screen. Installation availability depends on your browser.
 
-Set repository Settings → Pages → Source to **GitHub Actions**. Pushing to `main` validates and deploys the site at https://pugplayzyt.github.io/playdeck/ .
+PlayDeck launches as a fullscreen app where supported, with landscape orientation requested by its manifest. Android Chrome supports this for installed PWAs; iOS and ordinary browser tabs may require manual rotation. No APK, native build or app store is needed.
 
-## Android app
+Open online once and wait for **Games saved. Ready to play offline.** The service worker saves the library, games, icons and bundled Three.js. The installed app and browser can then play offline. A browser may evict site storage; reopen online if games need to be saved again. Scores stay in local storage on the current device.
 
-[Download the Android APK](https://github.com/pugplayzYT/playdeck/releases/download/android-latest/playdeck.apk) after the **Build Android app** workflow completes. On Android, open the downloaded APK and allow installation from your browser when prompted. Requires Android 7.0+ and an up-to-date Android System WebView. The preview app runs in landscape in either horizontal orientation, hides system bars during play, and includes games offline. External links open in your browser. New games arrive through app updates; the website updates independently.
+When a new version is ready, use **Update PlayDeck** in the library. Updates do not interrupt an active game. Closing all PlayDeck tabs also lets a waiting update activate.
 
-The workflow builds and publishes an installable APK to the `android-latest` release. Pull requests build and lint without publishing. Preview builds use a development signing identity cached between builds. If that cache is lost, an update may require uninstalling the old preview, which removes local scores. For production distribution, configure a permanent private release signing key and increase versionCode for every release. This preview is not a Google Play release.
+## Development and GitHub Pages
 
-To build locally, install JDK 17+, Android SDK 35 and Gradle 8.9, set `ANDROID_HOME`, then run `gradle -p android assembleRelease lintRelease`. The build copies the web files into app assets. No JavaScript native bridge or network permission is needed.
+Run `npm run build` to generate the offline cache, then `npm start` (Python 3 required) and open http://localhost:8080. No dependency installation is needed. After editing files, run `npm run build` again. `npm run check` validates the catalog, local HTML references and PWA manifest. Service workers require HTTPS or localhost.
+
+Set repository Settings → Pages → Source to **GitHub Actions**. Pushing to `main` generates the content-hashed cache, validates files and deploys the static PWA. Relative paths keep the manifest, service worker and games scoped to `/playdeck/`.
 
 ## Touch controls
 
-Games use a circular touch joystick and large Play / Pause buttons. Releasing or cancelling the touch resets movement. Rotate your phone for landscape gameplay; the Android app enforces landscape. Browsers may refuse orientation locking outside fullscreen. Keyboard controls remain available, and optional external gamepads use the shared input API.
-
-Snake uses Canvas 2D and stores high scores locally when storage is available. Wander requires WebGL. Test on actual phones before claiming device support.
+Games use a circular joystick and large Play / Pause buttons. Two-thumb input is supported; releasing or cancelling a touch resets movement. Keyboard and optional external gamepads remain available. Snake uses Canvas 2D. Wander requires WebGL. Test real phones and installed PWAs before claiming device compatibility.
 
 ## Contribute
 

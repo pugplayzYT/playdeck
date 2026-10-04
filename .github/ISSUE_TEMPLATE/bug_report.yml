@@ -36,7 +36,7 @@ body:
     id: device
     attributes:
       label: Device and browser
-      placeholder: Android app, Android Chrome, iPhone Safari, desktop Chrome, etc.
+      placeholder: Installed PWA, Android Chrome, iPhone Safari, desktop Chrome, etc.
     validations:
       required: true
   - type: dropdown

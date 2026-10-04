@@ -14,13 +14,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: npm run build
       - run: npm run check
       - name: Check first-party JavaScript syntax
         run: find assets games scripts -name '*.js' -o -name '*.mjs' | xargs -n 1 node --check
+      - name: Check service worker syntax
+        run: node --check sw.js && node --check precache.js
       - name: Prepare static site
         run: |
           mkdir _site
-          cp index.html games.json _site/
+          cp index.html offline.html games.json manifest.webmanifest sw.js precache.js _site/
           cp -r assets games vendor _site/
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
