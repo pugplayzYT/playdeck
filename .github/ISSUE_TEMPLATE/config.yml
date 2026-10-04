@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Game contribution guide
+    url: https://github.com/pugplayzYT/playdeck/blob/main/CONTRIBUTING.md
+    about: Learn how to submit a playable HTML game through a pull request.

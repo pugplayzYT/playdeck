@@ -1,0 +1,42 @@
+name: Game suggestion
+description: Suggest a game idea or discuss a game you want to contribute.
+title: "[Game]: "
+body:
+  - type: markdown
+    attributes:
+      value: "Game ideas are welcome! An issue starts a discussion; playable games must be submitted through a pull request. See [CONTRIBUTING.md](https://github.com/pugplayzYT/playdeck/blob/main/CONTRIBUTING.md) for the starter template and review requirements."
+  - type: input
+    id: name
+    attributes:
+      label: Game name
+    validations:
+      required: true
+  - type: textarea
+    id: concept
+    attributes:
+      label: Game concept
+      description: What does the player do, and what makes it fun?
+    validations:
+      required: true
+  - type: textarea
+    id: controls
+    attributes:
+      label: Proposed controls
+      description: Describe controller, keyboard, and touch controls where possible.
+    validations:
+      required: true
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Would you like to build it?
+      options:
+        - I am suggesting an idea
+        - I would like to build it
+        - I already have a prototype
+    validations:
+      required: true
+  - type: textarea
+    id: technical
+    attributes:
+      label: Technical details and assets
+      description: Optional — 2D or Three.js, prototype links, performance considerations, and asset sources or licenses.
