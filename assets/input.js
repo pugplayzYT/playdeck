@@ -27,6 +27,20 @@
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (event) { stick.addEventListener(event, function (e) { if (e.pointerId === pointer) clearTouch(); }); });
     stick.addEventListener('keydown', function (e) { var action = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'}[e.key]; if (action) { e.preventDefault(); emit(action); } });
   }
+  // Mobile browsers often reserve click synthesis for the first finger.
+  // Trigger action buttons on touch-down so a second thumb works with the stick.
+  document.querySelectorAll('.game-actions button').forEach(function (button) {
+    var handledAt = 0;
+    button.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'touch') return;
+      e.preventDefault(); handledAt = Date.now(); button.click();
+    });
+    button.addEventListener('click', function (e) {
+      if (e.isTrusted && (e.pointerType === 'touch' || (e.detail > 0 && Date.now() - handledAt < 700))) {
+        e.preventDefault(); e.stopImmediatePropagation();
+      }
+    }, true);
+  });
   window.addEventListener('blur', clearTouch);
   document.addEventListener('visibilitychange', function () { if (document.hidden) { clearTouch(); axes[0] = axes[1] = 0; } });
   function frame(time) {
