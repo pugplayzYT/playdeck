@@ -1,0 +1,18 @@
+[
+  {
+    "id": "snake",
+    "title": "Snake",
+    "description": "A familiar classic. A fresh high score to chase.",
+    "category": "Arcade",
+    "author": "PlayDeck",
+    "entry": "games/snake/index.html"
+  },
+  {
+    "id": "wander",
+    "title": "Wander",
+    "description": "Take the scenic route through a little 3D world.",
+    "category": "Exploration",
+    "author": "PlayDeck",
+    "entry": "games/wander/index.html"
+  }
+]
